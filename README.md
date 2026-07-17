@@ -1,6 +1,6 @@
 # فكة — Fakka
 
-**Automatic spare change savings for the Saudi market.**
+**Automatic spare change savings**
 
 Every riyal you spend comes back to you as savings. Fakka automatically rounds up your transactions and saves the spare change — so you save without even noticing.
 
@@ -14,7 +14,7 @@ Every riyal you spend comes back to you as savings. Fakka automatically rounds u
 - **Savings Goals** — Set custom goals (Umrah, new phone, laptop, etc.) and track progress
 - **Monthly Reports** — Visualize your savings with bar charts, merchant breakdowns, and insights
 - **Smart Suggestions** — AI-powered tips to maximize your savings based on spending patterns
-- **Multi-Account Support** — Link multiple Saudi bank accounts (Al Rajhi, Al Inma, SNB, Riyad Bank, etc.)
+- **Multi-Account Support** — Link multiple Saudi bank accounts (Al Inma, Al Rajhi, SNB, Riyad Bank, etc.)
 - **Notifications** — Real-time alerts for round-ups, goal milestones, and weekly reports
 - **Profile & Stats** — Track total savings, active goals, and streak days
 
@@ -22,7 +22,7 @@ Every riyal you spend comes back to you as savings. Fakka automatically rounds u
 
 | Welcome | Login | Bank Linking | Dashboard |
 |---------|-------|-------------|-----------|
-| ![Screen 1](Screen%201.png) | | | |
+| ![Screen 1](Screen%201.png) 
 
 ## Getting Started
 
@@ -30,7 +30,6 @@ Fakka is a single-file HTML prototype. No build tools or dependencies required.
 
 ```bash
 # Simply open in a browser
-open fakkah.html        # Full-featured version (with animations & modals)
 open fekka-prototype.html  # Lightweight prototype version
 ```
 
@@ -69,8 +68,8 @@ fekka/
 
 | Bank | Status |
 |------|--------|
-| Al Rajhi (الراجحي) | Supported |
 | Al Inma (الإنماء) | Supported |
+| Al Rajhi (الراجحي) | Supported |
 | Al Ahli (الأهلي) | Supported |
 | SNB (ساب) | Supported |
 | Riyad Bank (الرياض) | Supported |
