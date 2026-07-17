@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فكة - ادخار الفكة التلقائي</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+#app {
+  max-width: 430px;
+  margin: 0 auto;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+.pg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  overflow-y: auto;
+  background: #f5f5f5;
+}
+.pg.on { display: block; }
+.vw { display: none; }
+.vw.on { display: block; }
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+.w-full { width: 100%; }
+.green { color: #00843D; }
+.bggreen { background: #00843D; color: white; }
+.card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 10px; }
+.gap8 { gap: 8px; }
+.gap10 { gap: 10px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+.flex-1 { flex: 1; }
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+.mb6 { margin-bottom: 6px; }
+.mb8 { margin-bottom: 8px; }
+.mb12 { margin-bottom: 12px; }
+.mb16 { margin-bottom: 16px; }
+.mb24 { margin-bottom: 24px; }
+.p20 { padding: 20px; }
+.p24 { padding: 24px; }
+.px20 { padding-left: 20px; padding-right: 20px; }
+.py12 { padding-top: 12px; padding-bottom: 12px; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 12px; color: #999; }
+.text-xl { font-size: 24px; font-weight: 800; }
+.text-2xl { font-size: 36px; font-weight: 800; }
+.rounded-full { border-radius: 50%; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  width: 100%;
+}
+.br { border-radius: 10px; border: 1.5px solid #ddd; }
+input.br { padding: 14px; font-size: 16px; text-align: center; }
+.otp-box {
+  width: 50px;
+  height: 58px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+}
+.otp-box.filled {
+  border-color: #00843D;
+  background: #e8f5e9;
+}
+.bank-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+}
+.bank-item.sel {
+  border-color: #00843D;
+  background: #e8f5e9;
+}
+.bank-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+.bank-label { font-size: 12px; color: #888; }
+.savings-card {
+  background: linear-gradient(135deg, #00843D, #005A2E);
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.roundup-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.roundup-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+.quick-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 68px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 6px 6px 20px;
+  border-top: 1px solid #eee;
+  z-index: 10;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+  padding: 2px 10px;
+  position: relative;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+.nav-icon { font-size: 20px; opacity: 0.4; }
+.nav-label { font-size: 10px; color: #aaa; font-weight: 500; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-item.active .nav-label { color: #00843D; font-weight: 700; }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  width: 20px;
+  height: 3px;
+  background: #00843D;
+  border-radius: 0 0 3px 3px;
+}
+.filter-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: none;
+  font-family: inherit;
+  color: #666;
+}
+.filter-tab.active {
+  background: #00843D;
+  color: white;
+  border-color: #00843D;
+}
+.goal-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 10px;
+}
+.progress-bg {
+  width: 100%;
+  height: 7px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #00843D, #00a84d);
+}
+.mult {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mult.active {
+  background: #00843D;
+  color: white;
+  border-color: #00843D;
+}
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+.views-cont {
+  height: calc(100% - 118px);
+  overflow-y: auto;
+  position: relative;
+}
+.loading-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.95);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 50;
+}
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #eee;
+  border-top-color: #00843D;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast-el {
+  position: absolute;
+  bottom: 90px;
+  left: 20px;
+  right: 20px;
+  background: #1a1a2e;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 200;
+  pointer-events: none;
+}
+.toast-el.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ════ PAGE 1: WELCOME ════ -->
+<div class="pg on" id="pg-welcome">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 32px;text-align:center">
+    <div style="width:110px;height:110px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:50px;margin-bottom:24px">💰</div>
+    <h1 style="font-size:30px;margin-bottom:16px;line-height:1.4">كل ريال ينصرف<br>يرجع لك مدخر</h1>
+    <p style="color:#666;line-height:1.8;margin-bottom:36px;font-size:15px">تخيل كل مرة تشتري فيها، الفكة ترجع لحسابك بدون ما تحس. تقريب تلقائي وادخار ذكي.</p>
+    <button class="btn bggreen" onclick="go('pg-login')" style="max-width:260px">ابدأ الآن</button>
+  </div>
+</div>
+
+<!-- ════ PAGE 2: LOGIN ════ -->
+<div class="pg" id="pg-login">
+  <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding:0 32px">
+    <div class="text-center" style="font-size:44px;margin-bottom:8px">💰</div>
+    <h2 class="text-center" style="font-size:24px;margin-bottom:4px">مرحباً بك في فكة</h2>
+    <p class="text-center" style="color:#888;margin-bottom:28px;font-size:14px">أدخل رقم جوالك لبدء رحلة الادخار</p>
+    <div id="login-form">
+      <label style="font-size:13px;font-weight:600;color:#666;display:block;margin-bottom:6px">رقم الجوال</label>
+      <input type="tel" id="phone" class="br w-full" placeholder="٠٥٥ xxx xxxx" maxlength="10" dir="ltr">
+      <button class="btn bggreen mt16" onclick="sendOTP()">إرسال رمز التحقق</button>
+      <p class="text-center text-xs mt16">بالتسجيل أنت توافق على الشروط والأحكام</p>
+    </div>
+    <div id="otp-form" style="display:none;text-align:center">
+      <p style="color:#666;margin-bottom:20px;font-size:14px">أدخل رمز التحقق</p>
+      <div id="otp-cont" style="display:flex;gap:10px;justify-content:center;direction:ltr">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE 3: BANK ════ -->
+<div class="pg" id="pg-bank">
+  <div class="p24">
+    <button onclick="go('pg-login')" style="width:40px;height:40px;border-radius:50%;border:none;background:white;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer;margin-bottom:20px">←</button>
+    <h2 style="font-size:22px;margin-bottom:6px">اربط حسابك البنكي</h2>
+    <p style="color:#888;font-size:14px;margin-bottom:28px">اختر بنكك لربط الحساب بشكل آمن</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#8bc34a">الإنماء</div><span class="bank-label">الإنماء</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#006842">الراجحي</div><span class="bank-label">الراجحي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#4a7c59">الأهلي</div><span class="bank-label">الأهلي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#003057">ساب</div><span class="bank-label">ساب</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#1e88e5">الرياض</div><span class="bank-label">الرياض</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#5d4037">العربي</div><span class="bank-label">العربي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#0d47a1">البلاد</div><span class="bank-label">البلاد</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#2e7d32">الجزيرة</div><span class="bank-label">الجزيرة</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#6a1b9a">أكثر ▼</div><span class="bank-label">بنوك أخرى</span></div>
+    </div>
+  </div>
+  <div class="loading-overlay" id="bank-load">
+    <div class="spinner"></div>
+    <div style="font-weight:600;color:#666">جاري ربط الحساب البنكي...</div>
+    <p class="text-xs">يتم التوجيه إلى البنك للموافقة</p>
+  </div>
+</div>
+
+<!-- ════ PAGE 4: MAIN APP ════ -->
+<div class="pg" id="pg-main">
+  <div class="header-bar">
+    <span style="font-size:20px;font-weight:800;color:#00843D">فـــكــة</span>
+    <div style="display:flex;gap:12px">
+      <span style="font-size:18px;cursor:pointer" onclick="toast('لا توجد إشعارات جديدة')">🔔</span>
+      <span style="font-size:18px;cursor:pointer" onclick="toast('الملف الشخصي - قريباً')">👤</span>
+    </div>
+  </div>
+
+  <div class="views-cont" id="views-cont">
+    <!-- VIEW: Dashboard -->
+    <div class="vw on" id="vw-dash">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="savings-card">
+          <div class="text-sm" style="opacity:0.8;margin-bottom:4px">إجمالي الفكة المتراكمة</div>
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:36px;font-weight:800" id="savings-num">٣٬٤٥٠</span><span style="font-size:15px;opacity:0.6">ريال</span></div>
+          <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-top:10px">▲ +١٢٪ هذا الشهر</div>
+        </div>
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">آخر عمليات التقريب</span><span style="font-size:12px;color:#00843D;font-weight:600;cursor:pointer" onclick="sw('vw-txns')">عرض الكل</span></div>
+        <div id="dash-list"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px">
+          <button class="quick-action" onclick="sw('vw-report')"><div class="quick-icon" style="background:#e8f5e9">📊</div><span class="text-xs">التقرير</span></button>
+          <button class="quick-action" onclick="sw('vw-goals')"><div class="quick-icon" style="background:#fff8e1">🎯</div><span class="text-xs">الأهداف</span></button>
+          <button class="quick-action" onclick="sw('vw-settings')"><div class="quick-icon" style="background:#f3e5f5">⚙️</div><span class="text-xs">الإعدادات</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Transactions -->
+    <div class="vw" id="vw-txns">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">كل المعاملات</span></div>
+        <div class="flex gap8 mb12" style="overflow-x:auto" id="filter-bar">
+          <button class="filter-tab active" onclick="ft('all',this)">الكل</button>
+          <button class="filter-tab" onclick="ft('roundup',this)">عليها فكة</button>
+          <button class="filter-tab" onclick="ft('large',this)">٥٠+ ريال</button>
+        </div>
+        <div id="txn-list"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: Goals -->
+    <div class="vw" id="vw-goals">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">أهداف الادخار</span><span style="font-size:12px;color:#00843D;font-weight:600;cursor:pointer" onclick="toast('إضافة هدف - قريباً')">+ إضافة</span></div>
+        <div id="goals-list"></div>
+        <div style="background:#fff8e1;border-radius:10px;padding:14px;margin-top:16px">
+          <div style="font-weight:700;margin-bottom:4px;font-size:13px">💡 اقتراح ذكي</div>
+          <div style="font-size:13px;color:#666;line-height:1.6">حسب مشترياتك، الفكة الشهرية المتوقعة <strong style="color:#00843D">٦٥٠ ريال</strong>. تقدر تحقق هدف "جوال جديد" خلال <strong>٦ شهور</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Report -->
+    <div class="vw" id="vw-report">
+      <div class="p20" style="padding-bottom:100px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">التقرير الشهري</div>
+        <div class="card text-center" style="padding:24px">
+          <div class="text-xs mb8">يونيو ٢٠٢٦</div>
+          <div style="font-size:34px;font-weight:800;color:#00843D">٦٥٢</div>
+          <div class="text-xs">ريال فكة هذا الشهر</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+            <div><div style="font-size:20px;font-weight:800;color:#00843D">١٢٤</div><div style="font-size:11px;color:#aaa">عملية</div></div>
+            <div><div style="font-size:20px;font-weight:800;color:#00843D">٥٫٢٦</div><div style="font-size:11px;color:#aaa">متوسط الفكة</div></div>
+          </div>
+        </div>
+        <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:10px">🏪 أكثر المتاجر فكة</div><ul id="m-list" style="list-style:none"></ul></div>
+        <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:8px">💡 نصيحة الشهر</div><div style="font-size:13px;color:#666;line-height:1.7">لو ضاعفت التقريب إلى <strong>×٢</strong>، كان ممكن تدخر <strong style="color:#00843D">١٬٣٠٠ ريال</strong> هذا الشهر!</div></div>
+        <button class="btn bggreen mt16" onclick="toast('تم نسخ التقرير')">مشاركة التقرير</button>
+      </div>
+    </div>
+
+    <!-- VIEW: Settings -->
+    <div class="vw" id="vw-settings">
+      <div class="p20" style="padding-bottom:100px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">الإعدادات</div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">التقريب</div>
+          <div class="flex justify-between mb8"><div><div style="font-weight:600;font-size:14px">مضاعف التقريب</div><div class="text-xs">×١ = تقريب لرقم واحد</div></div><span class="text-xs">×<span id="mult-v">١</span></span></div>
+          <div class="flex gap8">
+            <span class="mult active" onclick="setM(1,this)">١</span>
+            <span class="mult" onclick="setM(2,this)">٢</span>
+            <span class="mult" onclick="setM(3,this)">٣</span>
+            <span class="mult" onclick="setM(4,this)">٤</span>
+            <span class="mult" onclick="setM(5,this)">٥</span>
+          </div>
+        </div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الحسابات</div>
+          <div class="flex justify-between py12" style="border-bottom:1px solid #f0f0f0"><div class="flex items-center gap8"><div style="width:28px;height:28px;border-radius:6px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:13px">🏦</div><span style="font-size:13px;font-weight:500">الراجحي ****١٢٣٤</span></div><span class="text-xs">✅</span></div>
+          <div class="flex items-center gap8 py12" style="cursor:pointer" onclick="toast('إضافة حساب - قريباً')"><div style="width:28px;height:28px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px">➕</div><span style="font-size:13px;font-weight:500">أضف حساباً آخر</span></div>
+        </div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الإشعارات</div>
+          <div class="flex justify-between py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('تم تحديث الإشعارات')"><span style="font-size:13px;font-weight:500">🔔 إشعارات العمليات</span><span class="text-xs">مفعلة</span></div>
+          <div class="flex justify-between py12"><span style="font-size:13px;font-weight:500">📅 تقرير أسبوعي</span><span class="text-xs">الجمعة</span></div>
+        </div>
+        <div class="card">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الأمان والدعم</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('جميع بياناتك مشفرة')">🔒 الخصوصية والأمان</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('تواصل: support@fekka.app')">❓ مساعدة ودعم</div>
+          <div class="py12" style="cursor:pointer" onclick="toast('فكة v1.0')">ℹ️ حول التطبيق <span style="float:left;color:#aaa;font-size:12px">v1.0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="sw('vw-dash')"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></button>
+    <button class="nav-item" onclick="sw('vw-txns')"><span class="nav-icon">📋</span><span class="nav-label">المعاملات</span></button>
+    <button class="nav-item" onclick="sw('vw-goals')"><span class="nav-icon">🎯</span><span class="nav-label">الأهداف</span></button>
+    <button class="nav-item" onclick="sw('vw-report')"><span class="nav-icon">📊</span><span class="nav-label">التقرير</span></button>
+    <button class="nav-item" onclick="sw('vw-settings')"><span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات</span></button>
+  </div>
+</div>
+
+<div class="toast-el" id="toast-el"></div>
+</div>
+
+<script>
+// ── Data ──
+const T = [
+  {m:'بنده', i:'🏪', b:'#e8f5e9', d:'اليوم', o:42.75, r:43},
+  {m:'أوبر', i:'🚕', b:'#fff3e0', d:'اليوم', o:23.20, r:24},
+  {m:'ستار باكس', i:'☕', b:'#e8f5e9', d:'اليوم', o:15.00, r:15},
+  {m:'صيدلية', i:'🏥', b:'#f3e5f5', d:'أمس', o:8.50, r:9},
+  {m:'نون', i:'📦', b:'#e3f2fd', d:'أمس', o:199.10, r:200},
+  {m:'جرير', i:'📚', b:'#fff3e0', d:'الأحد', o:103.00, r:103},
+  {m:'ماكدونالدز', i:'🍔', b:'#ffebee', d:'الأحد', o:37.75, r:38},
+  {m:'تمارا', i:'💳', b:'#e8f5e9', d:'السبت', o:84.50, r:85},
+];
+const G = [
+  {n:'جوال جديد', i:'📱', b:'#e3f2fd', c:700, t:4000, m:340},
+  {n:'عمرة', i:'🕋', b:'#e8f5e9', c:1200, t:2000, m:180},
+  {n:'لابتوب', i:'💻', b:'#fff3e0', c:350, t:5000, m:250},
+];
+const M = [
+  {n:'بنده', a:42, r:'g'}, {n:'ماكدونالدز', a:31, r:'s'},
+  {n:'نون', a:28, r:'b'}, {n:'أوبر', a:22}, {n:'صيدلية', a:15},
+];
+
+// ── Page Navigation ──
+function go(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if (id === 'pg-main') { renderDash(); renderTxns(); renderGoals(); renderMerchants(); }
+}
+
+// ── View Navigation ──
+function sw(id) {
+  document.querySelectorAll('.vw').forEach(v => v.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  var navs = document.querySelectorAll('.nav-item');
+  var idx = {dash:0, txns:1, goals:2, report:3, settings:4}[id.replace('vw-','')];
+  navs.forEach(function(n) { n.classList.remove('active'); });
+  if (navs[idx]) navs[idx].classList.add('active');
+}
+
+// ── Login ──
+function sendOTP() {
+  var p = document.getElementById('phone').value.replace(/\s/g,'');
+  if (p.length < 9) { toast('الرجاء إدخال رقم جوال صحيح'); return; }
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('otp-form').style.display = 'block';
+}
+
+(function() {
+  var box = document.getElementById('otp-cont');
+  if (!box) return;
+  box.addEventListener('input', function(e) {
+    var inp = e.target;
+    if (inp.value) { inp.classList.add('filled'); }
+    var n = inp.nextElementSibling;
+    if (inp.value && n) n.focus();
+    var all = box.querySelectorAll('input');
+    var done = true;
+    for (var i = 0; i < all.length; i++) { if (!all[i].value) { done = false; break; } }
+    if (done) {
+      setTimeout(function() {
+        toast('جاري التحقق...');
+        setTimeout(function() { go('pg-bank'); }, 1000);
+      }, 400);
+    }
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key !== 'Backspace' || e.target.value) return;
+    var p = e.target.previousElementSibling;
+    if (p) { p.focus(); p.value = ''; p.classList.remove('filled'); }
+  });
+})();
+
+// ── Bank ──
+function pickBank(el) {
+  document.querySelectorAll('.bank-item').forEach(function(b) { b.classList.remove('sel'); });
+  el.classList.add('sel');
+  var ld = document.getElementById('bank-load');
+  ld.style.display = 'flex';
+  setTimeout(function() { ld.style.display = 'none'; go('pg-main'); }, 2000);
+}
+
+// ── Render Dashboard ──
+function renderDash() {
+  var c = document.getElementById('dash-list');
+  if (!c) return;
+  var h = '';
+  for (var i = 0; i < 4 && i < T.length; i++) {
+    var t = T[i];
+    var saved = (t.r - t.o).toFixed(2);
+    h += '<div class="roundup-item"><div class="roundup-icon" style="background:'+t.b+'">'+t.i+'</div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+t.m+'</div><div class="text-xs">'+t.d+'</div></div><div style="text-align:left;direction:ltr"><div style="font-size:12px;color:#aaa;text-decoration:line-through">'+t.o.toFixed(2)+'</div><div style="font-size:13px;font-weight:700;color:#10b981">+'+saved+' ريال</div></div></div>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Render Transactions ──
+function renderTxns(f) {
+  var c = document.getElementById('txn-list');
+  if (!c) return;
+  var items = T.slice();
+  if (f === 'roundup') items = items.filter(function(t) { return t.r > t.o; });
+  else if (f === 'large') items = items.filter(function(t) { return t.o >= 50; });
+  var groups = {};
+  for (var i = 0; i < items.length; i++) {
+    if (!groups[items[i].d]) groups[items[i].d] = [];
+    groups[items[i].d].push(items[i]);
+  }
+  var h = '';
+  var dates = Object.keys(groups);
+  for (var d = 0; d < dates.length; d++) {
+    h += '<div style="font-size:12px;font-weight:700;color:#888;padding:6px 0">'+dates[d]+'</div>';
+    var txns = groups[dates[d]];
+    for (var j = 0; j < txns.length; j++) {
+      var t = txns[j];
+      var saved = (t.r - t.o).toFixed(2);
+      h += '<div class="roundup-item"><div class="roundup-icon" style="background:'+t.b+'">'+t.i+'</div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+t.m+'</div></div><div style="text-align:left;direction:ltr"><div style="font-size:12px;color:#aaa;text-decoration:line-through">'+t.o.toFixed(2)+'</div><div style="font-size:13px;font-weight:700;color:#10b981">+'+saved+' ريال</div></div></div>';
+    }
+  }
+  c.innerHTML = h;
+}
+
+function ft(f, el) {
+  document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  renderTxns(f === 'all' ? null : f);
+}
+
+// ── Render Goals ──
+function renderGoals() {
+  var c = document.getElementById('goals-list');
+  if (!c) return;
+  var h = '';
+  for (var i = 0; i < G.length; i++) {
+    var g = G[i];
+    var pct = Math.round((g.c / g.t) * 100);
+    h += '<div class="goal-card"><div class="flex justify-between mb8"><div class="flex items-center gap8"><div style="width:34px;height:34px;border-radius:50%;background:'+g.b+';display:flex;align-items:center;justify-content:center;font-size:15px">'+g.i+'</div><span style="font-size:14px;font-weight:600">'+g.n+'</span></div><span style="font-size:13px;font-weight:700;color:#00843D">'+pct+'%</span></div><div class="progress-bg"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="flex justify-between text-xs"><span>'+num(g.c)+' / '+num(g.t)+' ريال</span><span style="color:#10b981;font-weight:600">+'+g.m+' ريال/شهر</span></div></div>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Render Merchants ──
+function renderMerchants() {
+  var c = document.getElementById('m-list');
+  if (!c) return;
+  var colors = {g:'#d4af37', s:'#9ca3af', b:'#cd7f32'};
+  var h = '';
+  for (var i = 0; i < M.length; i++) {
+    var m = M[i];
+    var bg = m.r ? colors[m.r] || '#aaa' : '#aaa';
+    h += '<li style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0"><span style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;background:'+bg+'">'+(i+1)+'</span><span style="flex:1;font-size:13px;font-weight:500;margin-right:10px">'+m.n+'</span><span style="font-size:13px;font-weight:700;color:#00843D">+'+m.a+' ريال</span></li>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Helpers ──
+function num(x) { return x.toLocaleString('ar-SA'); }
+
+function setM(v, el) {
+  document.querySelectorAll('.mult').forEach(function(m) { m.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('mult-v').textContent = v;
+  toast('مضاعف التقريب: ×'+v);
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast-el');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2200);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فكة - ادخار الفكة التلقائي</title>
+<style>
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #eef1f0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+#app {
+  max-width: 430px;
+  margin: 0 auto;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f5f7f6;
+  box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+.pg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  overflow-y: auto;
+  background: #f5f7f6;
+}
+.pg.on { display: block; animation: fadeIn 0.35s ease; }
+.vw { display: none; }
+.vw.on { display: block; animation: slideUp 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+.w-full { width: 100%; }
+.green { color: #00843D; }
+.bggreen { background: #00843D; color: white; }
+.card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 10px; }
+.gap8 { gap: 8px; } .gap10 { gap: 10px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+.flex-1 { flex: 1; }
+.mt8 { margin-top: 8px; } .mt12 { margin-top: 12px; } .mt16 { margin-top: 16px; } .mt24 { margin-top: 24px; }
+.mb6 { margin-bottom: 6px; } .mb8 { margin-bottom: 8px; } .mb12 { margin-bottom: 12px; } .mb16 { margin-bottom: 16px; } .mb24 { margin-bottom: 24px; }
+.p20 { padding: 20px; } .p24 { padding: 24px; }
+.py12 { padding-top: 12px; padding-bottom: 12px; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 12px; color: #999; }
+.rounded-full { border-radius: 50%; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 15px 32px; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 700; width: 100%;
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+.btn:active { transform: scale(0.97); }
+.bggreen.btn { box-shadow: 0 4px 14px rgba(0,132,61,0.28); }
+.btn-ghost { background: #e8f5e9; color: #00843D; }
+.br { border-radius: 12px; border: 1.5px solid #dde3e0; transition: border-color 0.2s; }
+input.br { padding: 14px; font-size: 16px; text-align: center; }
+input.br:focus { outline: none; border-color: #00843D; }
+.otp-box {
+  width: 50px; height: 58px; text-align: center; font-size: 22px; font-weight: 700;
+  border: 1.5px solid #dde3e0; border-radius: 10px; transition: all 0.2s;
+}
+.otp-box:focus { outline: none; border-color: #00843D; }
+.otp-box.filled { border-color: #00843D; background: #e8f5e9; }
+.bank-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 6px; border: 1.5px solid #dde3e0; border-radius: 12px;
+  background: white; cursor: pointer; transition: all 0.18s;
+}
+.bank-item:active { transform: scale(0.95); }
+.bank-item.sel { border-color: #00843D; background: #e8f5e9; }
+.bank-logo {
+  width: 44px; height: 44px; border-radius: 8px; display: flex;
+  align-items: center; justify-content: center; color: white;
+  font-size: 13px; font-weight: 700;
+}
+.bank-label { font-size: 12px; color: #888; }
+.savings-card {
+  background: linear-gradient(135deg, #00a84d 0%, #00843D 55%, #00522a 100%);
+  border-radius: 20px; padding: 24px; color: white;
+  position: relative; overflow: hidden; margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0,132,61,0.32);
+}
+.savings-card::after {
+  content: ''; position: absolute; top: -50px; left: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.savings-card::before {
+  content: ''; position: absolute; bottom: -60px; right: -30px;
+  width: 130px; height: 130px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.roundup-item {
+  display: flex; align-items: center; padding: 12px 14px; background: white;
+  border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); gap: 10px; margin-bottom: 6px;
+  animation: pop 0.3s ease both;
+}
+.roundup-icon {
+  width: 38px; height: 38px; border-radius: 10px; display: flex;
+  align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.quick-action {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px;
+  background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  cursor: pointer; border: none; font-family: inherit; transition: transform 0.12s;
+}
+.quick-action:active { transform: scale(0.94); }
+.quick-icon {
+  width: 38px; height: 38px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 16px;
+}
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 68px; background: white;
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 6px 6px 20px; border-top: 1px solid #eee; z-index: 10;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  cursor: pointer; padding: 2px 10px; position: relative; background: none; border: none; font-family: inherit;
+  transition: transform 0.12s;
+}
+.nav-item:active { transform: scale(0.9); }
+.nav-icon { font-size: 20px; opacity: 0.4; transition: opacity 0.2s; }
+.nav-label { font-size: 10px; color: #aaa; font-weight: 500; transition: color 0.2s; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-item.active .nav-label { color: #00843D; font-weight: 700; }
+.nav-item.active::before {
+  content: ''; position: absolute; top: -1px; width: 20px; height: 3px;
+  background: #00843D; border-radius: 0 0 3px 3px;
+}
+.filter-tab {
+  padding: 7px 15px; border-radius: 20px; border: 1.5px solid #dde3e0;
+  font-size: 12px; cursor: pointer; white-space: nowrap; background: none;
+  font-family: inherit; color: #666; transition: all 0.18s;
+}
+.filter-tab.active { background: #00843D; color: white; border-color: #00843D; }
+.goal-card { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 10px; animation: pop 0.3s ease both; }
+.progress-bg { width: 100%; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #00843D, #00c85a); transition: width 0.8s ease; }
+.mult {
+  width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #dde3e0;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+  font-size: 14px; cursor: pointer; transition: all 0.15s;
+}
+.mult:active { transform: scale(0.9); }
+.mult.active { background: #00843D; color: white; border-color: #00843D; }
+.header-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: white; border-bottom: 1px solid #eee;
+}
+.views-cont { height: calc(100% - 118px); overflow-y: auto; position: relative; }
+.loading-overlay {
+  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255,255,255,0.96); flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px; z-index: 50;
+}
+.spinner { width: 44px; height: 44px; border: 4px solid #eee; border-top-color: #00843D; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast-el {
+  position: absolute; bottom: 90px; left: 20px; right: 20px; background: #1a1a2e;
+  color: white; padding: 14px 18px; border-radius: 12px; font-size: 13px; font-weight: 500;
+  text-align: center; opacity: 0; transition: opacity 0.3s; z-index: 200; pointer-events: none;
+}
+.toast-el.show { opacity: 1; }
+/* Modal */
+.modal-overlay {
+  display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+  z-index: 300; align-items: flex-end; animation: fadeIn 0.25s;
+}
+.modal-overlay.on { display: flex; }
+.modal-sheet {
+  width: 100%; background: white; border-radius: 20px 20px 0 0; padding: 22px 20px 30px;
+  animation: sheetUp 0.3s ease; max-height: 85%; overflow-y: auto;
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 0 auto 18px; }
+.icon-pick {
+  width: 46px; height: 46px; border-radius: 12px; border: 1.5px solid #eee;
+  display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: all 0.15s;
+}
+.icon-pick.sel { border-color: #00843D; background: #e8f5e9; }
+.empty-state { text-align: center; padding: 40px 20px; color: #aaa; }
+.empty-state .emoji { font-size: 46px; margin-bottom: 12px; opacity: 0.6; }
+.field-label { font-size: 13px; font-weight: 600; color: #666; display: block; margin-bottom: 6px; }
+input.field { width: 100%; padding: 13px 14px; font-size: 15px; border: 1.5px solid #dde3e0; border-radius: 12px; text-align: right; }
+input.field:focus { outline: none; border-color: #00843D; }
+.avatar-big {
+  width: 84px; height: 84px; border-radius: 50%;
+  background: linear-gradient(135deg, #00a84d, #00843D);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; color: white; margin: 0 auto 12px; font-weight: 800;
+}
+.stat-pill { flex: 1; background: white; border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ════ PAGE 1: WELCOME ════ -->
+<div class="pg on" id="pg-welcome">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 32px;text-align:center">
+    <div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#e8f5e9,#c8ebd0);display:flex;align-items:center;justify-content:center;font-size:50px;margin-bottom:24px;box-shadow:0 8px 24px rgba(0,132,61,0.15)">💰</div>
+    <h1 style="font-size:30px;margin-bottom:16px;line-height:1.4">كل ريال ينصرف<br>يرجع لك مدخر</h1>
+    <p style="color:#666;line-height:1.8;margin-bottom:36px;font-size:15px">تخيل كل مرة تشتري فيها، الفكة ترجع لحسابك بدون ما تحس. تقريب تلقائي وادخار ذكي.</p>
+    <button class="btn bggreen" onclick="go('pg-login')" style="max-width:260px">ابدأ الآن</button>
+  </div>
+</div>
+
+<!-- ════ PAGE 2: LOGIN ════ -->
+<div class="pg" id="pg-login">
+  <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding:0 32px">
+    <div class="text-center" style="font-size:44px;margin-bottom:8px">💰</div>
+    <h2 class="text-center" style="font-size:24px;margin-bottom:4px">مرحباً بك في فكة</h2>
+    <p class="text-center" style="color:#888;margin-bottom:28px;font-size:14px">أدخل رقم جوالك لبدء رحلة الادخار</p>
+    <div id="login-form">
+      <label class="field-label">رقم الجوال</label>
+      <input type="tel" id="phone" class="br w-full" placeholder="٠٥٥ xxx xxxx" maxlength="10" dir="ltr">
+      <button class="btn bggreen mt16" onclick="sendOTP()">إرسال رمز التحقق</button>
+      <p class="text-center text-xs mt16">بالتسجيل أنت توافق على الشروط والأحكام</p>
+    </div>
+    <div id="otp-form" style="display:none;text-align:center">
+      <p style="color:#666;margin-bottom:20px;font-size:14px">أدخل رمز التحقق المرسل إلى جوالك</p>
+      <div id="otp-cont" style="display:flex;gap:10px;justify-content:center;direction:ltr">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+        <input class="otp-box" maxlength="1" inputmode="numeric">
+      </div>
+      <p class="text-xs mt16" style="cursor:pointer;color:#00843D;font-weight:600" onclick="toast('تم إرسال رمز جديد')">إعادة إرسال الرمز</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE 3: BANK ════ -->
+<div class="pg" id="pg-bank">
+  <div class="p24">
+    <button onclick="go('pg-login')" style="width:40px;height:40px;border-radius:50%;border:none;background:white;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer;margin-bottom:20px">←</button>
+    <h2 style="font-size:22px;margin-bottom:6px">اربط حسابك البنكي</h2>
+    <p style="color:#888;font-size:14px;margin-bottom:12px">اختر بنكك لربط الحساب بشكل آمن عبر الخدمات المصرفية المفتوحة</p>
+    <div style="background:#e8f5e9;border-radius:10px;padding:10px 12px;font-size:12px;color:#00843D;margin-bottom:24px;display:flex;align-items:center;gap:8px">🔒 اتصال مشفّر ومعتمد من البنك المركزي السعودي</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#8bc34a">الإنماء</div><span class="bank-label">الإنماء</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#006842">الراجحي</div><span class="bank-label">الراجحي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#4a7c59">الأهلي</div><span class="bank-label">الأهلي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#003057">ساب</div><span class="bank-label">ساب</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#1e88e5">الرياض</div><span class="bank-label">الرياض</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#5d4037">العربي</div><span class="bank-label">العربي</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#0d47a1">البلاد</div><span class="bank-label">البلاد</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#2e7d32">الجزيرة</div><span class="bank-label">الجزيرة</span></div>
+      <div class="bank-item" onclick="pickBank(this)"><div class="bank-logo" style="background:#6a1b9a">أكثر ▼</div><span class="bank-label">بنوك أخرى</span></div>
+    </div>
+  </div>
+  <div class="loading-overlay" id="bank-load">
+    <div class="spinner"></div>
+    <div style="font-weight:600;color:#666">جاري ربط الحساب البنكي...</div>
+    <p class="text-xs">يتم التوجيه إلى البنك للموافقة</p>
+  </div>
+</div>
+
+<!-- ════ PAGE 4: MAIN APP ════ -->
+<div class="pg" id="pg-main">
+  <div class="header-bar">
+    <span style="font-size:20px;font-weight:800;color:#00843D">فـــكــة</span>
+    <div style="display:flex;gap:14px">
+      <span style="font-size:18px;cursor:pointer" onclick="openNotif()">🔔</span>
+      <span style="font-size:18px;cursor:pointer" onclick="sw('vw-profile')">👤</span>
+    </div>
+  </div>
+
+  <div class="views-cont" id="views-cont">
+    <!-- VIEW: Dashboard -->
+    <div class="vw on" id="vw-dash">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="savings-card">
+          <div class="text-sm" style="opacity:0.85;margin-bottom:4px;position:relative;z-index:1">إجمالي الفكة المتراكمة</div>
+          <div style="display:flex;align-items:baseline;gap:6px;position:relative;z-index:1"><span style="font-size:38px;font-weight:800" id="savings-num">٠</span><span style="font-size:15px;opacity:0.7">ريال</span></div>
+          <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.18);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-top:12px;position:relative;z-index:1">▲ +١٢٪ هذا الشهر</div>
+        </div>
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">آخر عمليات التقريب</span><span style="font-size:12px;color:#00843D;font-weight:600;cursor:pointer" onclick="sw('vw-txns')">عرض الكل</span></div>
+        <div id="dash-list"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px">
+          <button class="quick-action" onclick="sw('vw-report')"><div class="quick-icon" style="background:#e8f5e9">📊</div><span class="text-xs">التقرير</span></button>
+          <button class="quick-action" onclick="sw('vw-goals')"><div class="quick-icon" style="background:#fff8e1">🎯</div><span class="text-xs">الأهداف</span></button>
+          <button class="quick-action" onclick="sw('vw-settings')"><div class="quick-icon" style="background:#f3e5f5">⚙️</div><span class="text-xs">الإعدادات</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Transactions -->
+    <div class="vw" id="vw-txns">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">كل المعاملات</span></div>
+        <div class="flex gap8 mb12" style="overflow-x:auto" id="filter-bar">
+          <button class="filter-tab active" onclick="ft('all',this)">الكل</button>
+          <button class="filter-tab" onclick="ft('roundup',this)">عليها فكة</button>
+          <button class="filter-tab" onclick="ft('large',this)">٥٠+ ريال</button>
+        </div>
+        <div id="txn-list"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: Goals -->
+    <div class="vw" id="vw-goals">
+      <div class="p20" style="padding-bottom:100px">
+        <div class="flex justify-between mb12"><span style="font-weight:700;font-size:16px">أهداف الادخار</span><span style="font-size:12px;color:#00843D;font-weight:600;cursor:pointer" onclick="openGoalModal()">+ إضافة</span></div>
+        <div id="goals-list"></div>
+        <div style="background:#fff8e1;border-radius:12px;padding:14px;margin-top:16px">
+          <div style="font-weight:700;margin-bottom:4px;font-size:13px">💡 اقتراح ذكي</div>
+          <div style="font-size:13px;color:#666;line-height:1.6">حسب مشترياتك، الفكة الشهرية المتوقعة <strong style="color:#00843D">٦٥٠ ريال</strong>. تقدر تحقق هدف "جوال جديد" خلال <strong>٦ شهور</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Report -->
+    <div class="vw" id="vw-report">
+      <div class="p20" style="padding-bottom:100px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">التقرير الشهري</div>
+        <div class="card text-center" style="padding:24px">
+          <div class="text-xs mb8">يونيو ٢٠٢٦</div>
+          <div style="font-size:34px;font-weight:800;color:#00843D">٦٥٢</div>
+          <div class="text-xs">ريال فكة هذا الشهر</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+            <div><div style="font-size:20px;font-weight:800;color:#00843D">١٢٤</div><div style="font-size:11px;color:#aaa">عملية</div></div>
+            <div><div style="font-size:20px;font-weight:800;color:#00843D">٥٫٢٦</div><div style="font-size:11px;color:#aaa">متوسط الفكة</div></div>
+          </div>
+        </div>
+        <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:12px">📈 الفكة خلال ٦ أشهر</div><div id="chart-cont"></div></div>
+        <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:10px">🏪 أكثر المتاجر فكة</div><ul id="m-list" style="list-style:none;margin:0;padding:0"></ul></div>
+        <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:8px">💡 نصيحة الشهر</div><div style="font-size:13px;color:#666;line-height:1.7">لو ضاعفت التقريب إلى <strong>×٢</strong>، كان ممكن تدخر <strong style="color:#00843D">١٬٣٠٠ ريال</strong> هذا الشهر!</div></div>
+        <button class="btn bggreen mt16" onclick="toast('تم نسخ التقرير للمشاركة')">مشاركة التقرير</button>
+      </div>
+    </div>
+
+    <!-- VIEW: Settings -->
+    <div class="vw" id="vw-settings">
+      <div class="p20" style="padding-bottom:100px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">الإعدادات</div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">التقريب</div>
+          <div class="flex justify-between mb8"><div><div style="font-weight:600;font-size:14px">مضاعف التقريب</div><div class="text-xs">×١ = تقريب لأقرب ريال</div></div><span class="text-xs">×<span id="mult-v">١</span></span></div>
+          <div class="flex gap8">
+            <span class="mult active" onclick="setM(1,this)">١</span>
+            <span class="mult" onclick="setM(2,this)">٢</span>
+            <span class="mult" onclick="setM(3,this)">٣</span>
+            <span class="mult" onclick="setM(4,this)">٤</span>
+            <span class="mult" onclick="setM(5,this)">٥</span>
+          </div>
+        </div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الحسابات</div>
+          <div id="accounts-list"></div>
+          <div class="flex items-center gap8 py12" style="cursor:pointer" onclick="openAccountModal()"><div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px">➕</div><span style="font-size:13px;font-weight:500">أضف حساباً آخر</span></div>
+        </div>
+        <div class="card mb12">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الإشعارات</div>
+          <div class="flex justify-between py12" style="border-bottom:1px solid #f0f0f0"><span style="font-size:13px;font-weight:500">🔔 إشعارات العمليات</span><label class="tgl"><input type="checkbox" checked onchange="toast(this.checked?'تم تفعيل الإشعارات':'تم إيقاف الإشعارات')"><span class="tgl-sl"></span></label></div>
+          <div class="flex justify-between py12"><span style="font-size:13px;font-weight:500">📅 تقرير أسبوعي</span><label class="tgl"><input type="checkbox" checked onchange="toast(this.checked?'التقرير الأسبوعي مفعّل':'تم إيقاف التقرير')"><span class="tgl-sl"></span></label></div>
+        </div>
+        <div class="card">
+          <div class="text-xs" style="font-weight:700;letter-spacing:1px;margin-bottom:8px">الأمان والدعم</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('جميع بياناتك مشفّرة بالكامل')">🔒 الخصوصية والأمان</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('تواصل معنا: support@fekka.app')">❓ مساعدة ودعم</div>
+          <div class="py12" style="cursor:pointer" onclick="toast('فكة v1.0')">ℹ️ حول التطبيق <span style="float:left;color:#aaa;font-size:12px">v1.0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: Profile -->
+    <div class="vw" id="vw-profile">
+      <div class="p20" style="padding-bottom:100px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">الملف الشخصي</div>
+        <div class="card text-center" style="padding:24px">
+          <div class="avatar-big">أ</div>
+          <div style="font-weight:700;font-size:17px">أحمد العتيبي</div>
+          <div class="text-xs" style="margin-top:2px">٠٥٥ ١٢٣ ٤٥٦٧</div>
+          <div style="display:flex;gap:10px;margin-top:18px">
+            <div class="stat-pill"><div style="font-size:20px;font-weight:800;color:#00843D" id="p-total">٣٬٤٥٠</div><div class="text-xs">إجمالي مدخر</div></div>
+            <div class="stat-pill"><div style="font-size:20px;font-weight:800;color:#00843D">٣</div><div class="text-xs">أهداف نشطة</div></div>
+            <div class="stat-pill"><div style="font-size:20px;font-weight:800;color:#00843D">٤٥</div><div class="text-xs">يوم متتالي</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('تعديل الملف - قريباً')">✏️ تعديل البيانات الشخصية</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="sw('vw-settings')">⚙️ الإعدادات</div>
+          <div class="py12" style="cursor:pointer;border-bottom:1px solid #f0f0f0" onclick="toast('دعوة الأصدقاء - قريباً')">🎁 ادعُ صديقاً واربح</div>
+          <div class="py12" style="cursor:pointer;color:#d32f2f" onclick="logout()">🚪 تسجيل الخروج</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="sw('vw-dash')"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></button>
+    <button class="nav-item" onclick="sw('vw-txns')"><span class="nav-icon">📋</span><span class="nav-label">المعاملات</span></button>
+    <button class="nav-item" onclick="sw('vw-goals')"><span class="nav-icon">🎯</span><span class="nav-label">الأهداف</span></button>
+    <button class="nav-item" onclick="sw('vw-report')"><span class="nav-icon">📊</span><span class="nav-label">التقرير</span></button>
+    <button class="nav-item" onclick="sw('vw-settings')"><span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات</span></button>
+  </div>
+</div>
+
+<!-- ════ MODAL ════ -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet" id="modal-sheet"></div>
+</div>
+
+<div class="toast-el" id="toast-el"></div>
+</div>
+
+<style>
+.tgl { position: relative; display: inline-block; width: 42px; height: 24px; }
+.tgl input { opacity: 0; width: 0; height: 0; }
+.tgl-sl { position: absolute; inset: 0; background: #ccc; border-radius: 24px; transition: 0.3s; cursor: pointer; }
+.tgl-sl::before { content: ''; position: absolute; height: 18px; width: 18px; right: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+.tgl input:checked + .tgl-sl { background: #00843D; }
+.tgl input:checked + .tgl-sl::before { transform: translateX(-18px); }
+</style>
+
+<script>
+// ── Data ──
+const T = [
+  {m:'بنده', i:'🏪', b:'#e8f5e9', d:'اليوم', o:42.75, r:43},
+  {m:'أوبر', i:'🚕', b:'#fff3e0', d:'اليوم', o:23.20, r:24},
+  {m:'ستار باكس', i:'☕', b:'#e8f5e9', d:'اليوم', o:15.00, r:15},
+  {m:'صيدلية', i:'🏥', b:'#f3e5f5', d:'أمس', o:8.50, r:9},
+  {m:'نون', i:'📦', b:'#e3f2fd', d:'أمس', o:199.10, r:200},
+  {m:'جرير', i:'📚', b:'#fff3e0', d:'الأحد', o:103.00, r:103},
+  {m:'ماكدونالدز', i:'🍔', b:'#ffebee', d:'الأحد', o:37.75, r:38},
+  {m:'تمارا', i:'💳', b:'#e8f5e9', d:'السبت', o:84.50, r:85},
+];
+let G = [
+  {n:'جوال جديد', i:'📱', b:'#e3f2fd', c:700, t:4000, m:340},
+  {n:'عمرة', i:'🕋', b:'#e8f5e9', c:1200, t:2000, m:180},
+  {n:'لابتوب', i:'💻', b:'#fff3e0', c:350, t:5000, m:250},
+];
+const M = [
+  {n:'بنده', a:42, r:'g'}, {n:'ماكدونالدز', a:31, r:'s'},
+  {n:'نون', a:28, r:'b'}, {n:'أوبر', a:22}, {n:'صيدلية', a:15},
+];
+const CHART = [
+  {mo:'يناير', v:410}, {mo:'فبراير', v:480}, {mo:'مارس', v:390},
+  {mo:'أبريل', v:560}, {mo:'مايو', v:590}, {mo:'يونيو', v:652},
+];
+let ACCOUNTS = [{bank:'الراجحي', num:'١٢٣٤', active:true}];
+
+// ── Page Navigation ──
+function go(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if (id === 'pg-main') {
+    renderDash(); renderTxns(); renderGoals(); renderMerchants(); renderChart(); renderAccounts();
+    animateSavings(3450);
+  }
+}
+
+// ── View Navigation ──
+function sw(id) {
+  document.querySelectorAll('.vw').forEach(v => v.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.getElementById('views-cont').scrollTop = 0;
+  var navs = document.querySelectorAll('.nav-item');
+  var idx = {dash:0, txns:1, goals:2, report:3, settings:4}[id.replace('vw-','')];
+  navs.forEach(function(n) { n.classList.remove('active'); });
+  if (idx !== undefined && navs[idx]) navs[idx].classList.add('active');
+}
+
+// ── Animated savings counter ──
+function animateSavings(target) {
+  var el = document.getElementById('savings-num');
+  if (!el) return;
+  var start = 0, dur = 900, t0 = null;
+  function step(ts) {
+    if (!t0) t0 = ts;
+    var p = Math.min((ts - t0) / dur, 1);
+    var eased = 1 - Math.pow(1 - p, 3);
+    var val = Math.round(start + (target - start) * eased);
+    el.textContent = num(val);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Login ──
+function sendOTP() {
+  var p = document.getElementById('phone').value.replace(/\s/g,'');
+  if (p.length < 9) { toast('الرجاء إدخال رقم جوال صحيح'); return; }
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('otp-form').style.display = 'block';
+  var f = document.querySelector('#otp-cont input');
+  if (f) setTimeout(function(){ f.focus(); }, 100);
+}
+
+(function() {
+  var box = document.getElementById('otp-cont');
+  if (!box) return;
+  box.addEventListener('input', function(e) {
+    var inp = e.target;
+    if (inp.value) { inp.classList.add('filled'); }
+    var n = inp.nextElementSibling;
+    if (inp.value && n) n.focus();
+    var all = box.querySelectorAll('input');
+    var done = true;
+    for (var i = 0; i < all.length; i++) { if (!all[i].value) { done = false; break; } }
+    if (done) {
+      setTimeout(function() {
+        toast('جاري التحقق...');
+        setTimeout(function() { go('pg-bank'); }, 1000);
+      }, 400);
+    }
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key !== 'Backspace' || e.target.value) return;
+    var p = e.target.previousElementSibling;
+    if (p) { p.focus(); p.value = ''; p.classList.remove('filled'); }
+  });
+})();
+
+// ── Bank ──
+function pickBank(el) {
+  document.querySelectorAll('.bank-item').forEach(function(b) { b.classList.remove('sel'); });
+  el.classList.add('sel');
+  var ld = document.getElementById('bank-load');
+  ld.style.display = 'flex';
+  setTimeout(function() { ld.style.display = 'none'; go('pg-main'); }, 2000);
+}
+
+// ── Render Dashboard ──
+function renderDash() {
+  var c = document.getElementById('dash-list');
+  if (!c) return;
+  var h = '';
+  for (var i = 0; i < 4 && i < T.length; i++) {
+    var t = T[i];
+    var saved = (t.r - t.o).toFixed(2);
+    h += '<div class="roundup-item" style="animation-delay:'+(i*0.05)+'s"><div class="roundup-icon" style="background:'+t.b+'">'+t.i+'</div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+t.m+'</div><div class="text-xs">'+t.d+'</div></div><div style="text-align:left;direction:ltr"><div style="font-size:12px;color:#aaa;text-decoration:line-through">'+t.o.toFixed(2)+'</div><div style="font-size:13px;font-weight:700;color:#10b981">+'+saved+' ريال</div></div></div>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Render Transactions ──
+function renderTxns(f) {
+  var c = document.getElementById('txn-list');
+  if (!c) return;
+  var items = T.slice();
+  if (f === 'roundup') items = items.filter(function(t) { return t.r > t.o; });
+  else if (f === 'large') items = items.filter(function(t) { return t.o >= 50; });
+  if (items.length === 0) {
+    c.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><div>لا توجد معاملات في هذا التصنيف</div></div>';
+    return;
+  }
+  var groups = {};
+  for (var i = 0; i < items.length; i++) {
+    if (!groups[items[i].d]) groups[items[i].d] = [];
+    groups[items[i].d].push(items[i]);
+  }
+  var h = '';
+  var dates = Object.keys(groups);
+  for (var d = 0; d < dates.length; d++) {
+    h += '<div style="font-size:12px;font-weight:700;color:#888;padding:6px 0">'+dates[d]+'</div>';
+    var txns = groups[dates[d]];
+    for (var j = 0; j < txns.length; j++) {
+      var t = txns[j];
+      var saved = (t.r - t.o).toFixed(2);
+      h += '<div class="roundup-item"><div class="roundup-icon" style="background:'+t.b+'">'+t.i+'</div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+t.m+'</div></div><div style="text-align:left;direction:ltr"><div style="font-size:12px;color:#aaa;text-decoration:line-through">'+t.o.toFixed(2)+'</div><div style="font-size:13px;font-weight:700;color:#10b981">+'+saved+' ريال</div></div></div>';
+    }
+  }
+  c.innerHTML = h;
+}
+
+function ft(f, el) {
+  document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  renderTxns(f === 'all' ? null : f);
+}
+
+// ── Render Goals ──
+function renderGoals() {
+  var c = document.getElementById('goals-list');
+  if (!c) return;
+  if (G.length === 0) {
+    c.innerHTML = '<div class="empty-state"><div class="emoji">🎯</div><div>لا توجد أهداف بعد<br>أضف هدفك الأول لتبدأ الادخار!</div></div>';
+    return;
+  }
+  var h = '';
+  for (var i = 0; i < G.length; i++) {
+    var g = G[i];
+    var pct = Math.min(Math.round((g.c / g.t) * 100), 100);
+    h += '<div class="goal-card"><div class="flex justify-between mb8"><div class="flex items-center gap8"><div style="width:34px;height:34px;border-radius:50%;background:'+g.b+';display:flex;align-items:center;justify-content:center;font-size:15px">'+g.i+'</div><span style="font-size:14px;font-weight:600">'+g.n+'</span></div><span style="font-size:13px;font-weight:700;color:#00843D">'+pct+'%</span></div><div class="progress-bg"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="flex justify-between text-xs"><span>'+num(g.c)+' / '+num(g.t)+' ريال</span><span style="color:#10b981;font-weight:600">+'+g.m+' ريال/شهر</span></div></div>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Render Merchants ──
+function renderMerchants() {
+  var c = document.getElementById('m-list');
+  if (!c) return;
+  var colors = {g:'#d4af37', s:'#9ca3af', b:'#cd7f32'};
+  var h = '';
+  for (var i = 0; i < M.length; i++) {
+    var m = M[i];
+    var bg = m.r ? colors[m.r] || '#aaa' : '#aaa';
+    h += '<li style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0"><span style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;background:'+bg+'">'+(i+1)+'</span><span style="flex:1;font-size:13px;font-weight:500;margin-right:10px">'+m.n+'</span><span style="font-size:13px;font-weight:700;color:#00843D">+'+m.a+' ريال</span></li>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Render SVG Bar Chart ──
+function renderChart() {
+  var c = document.getElementById('chart-cont');
+  if (!c) return;
+  var W = 300, H = 140, pad = 20, n = CHART.length;
+  var max = Math.max.apply(null, CHART.map(function(x){return x.v;}));
+  var bw = (W - pad*2) / n * 0.55;
+  var gap = (W - pad*2) / n;
+  var bars = '', labels = '';
+  for (var i = 0; i < n; i++) {
+    var bh = (CHART[i].v / max) * (H - 40);
+    var x = pad + gap*i + (gap - bw)/2;
+    var y = H - 22 - bh;
+    var isLast = i === n-1;
+    var col = isLast ? '#00843D' : '#a5d6b8';
+    bars += '<rect x="'+x+'" y="'+(H-22)+'" width="'+bw+'" height="0" rx="4" fill="'+col+'"><animate attributeName="height" from="0" to="'+bh+'" dur="0.7s" begin="'+(i*0.08)+'s" fill="freeze"/><animate attributeName="y" from="'+(H-22)+'" to="'+y+'" dur="0.7s" begin="'+(i*0.08)+'s" fill="freeze"/></rect>';
+    labels += '<text x="'+(x+bw/2)+'" y="'+(H-8)+'" font-size="9" fill="#999" text-anchor="middle">'+CHART[i].mo+'</text>';
+  }
+  c.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+bars+labels+'</svg>';
+}
+
+// ── Accounts ──
+function renderAccounts() {
+  var c = document.getElementById('accounts-list');
+  if (!c) return;
+  var h = '';
+  for (var i = 0; i < ACCOUNTS.length; i++) {
+    var a = ACCOUNTS[i];
+    h += '<div class="flex justify-between py12" style="border-bottom:1px solid #f0f0f0"><div class="flex items-center gap8"><div style="width:28px;height:28px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:13px">🏦</div><span style="font-size:13px;font-weight:500">'+a.bank+' ****'+a.num+'</span></div><span class="text-xs">✅</span></div>';
+  }
+  c.innerHTML = h;
+}
+
+// ── Modals ──
+function openModal(html) {
+  document.getElementById('modal-sheet').innerHTML = '<div class="modal-handle"></div>' + html;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+
+var pickedIcon = '🎯';
+function openGoalModal() {
+  pickedIcon = '🎯';
+  var icons = ['🎯','📱','💻','🕋','✈️','🚗','🏠','🎓','💍','🎁'];
+  var ih = '';
+  for (var i = 0; i < icons.length; i++) {
+    ih += '<div class="icon-pick'+(icons[i]==='🎯'?' sel':'')+'" onclick="pickIcon(this,\''+icons[i]+'\')">'+icons[i]+'</div>';
+  }
+  openModal(
+    '<h3 style="margin:0 0 18px;font-size:18px">هدف ادخار جديد</h3>'+
+    '<label class="field-label">اسم الهدف</label>'+
+    '<input class="field" id="g-name" placeholder="مثال: سيارة جديدة">'+
+    '<label class="field-label" style="margin-top:14px">المبلغ المستهدف (ريال)</label>'+
+    '<input class="field" id="g-target" type="number" inputmode="numeric" placeholder="مثال: 5000">'+
+    '<label class="field-label" style="margin-top:14px">اختر أيقونة</label>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px" id="icon-grid">'+ih+'</div>'+
+    '<button class="btn bggreen" style="margin-top:22px" onclick="saveGoal()">إنشاء الهدف</button>'
+  );
+}
+function pickIcon(el, ic) {
+  pickedIcon = ic;
+  document.querySelectorAll('#icon-grid .icon-pick').forEach(function(x){ x.classList.remove('sel'); });
+  el.classList.add('sel');
+}
+function saveGoal() {
+  var name = document.getElementById('g-name').value.trim();
+  var target = parseInt(document.getElementById('g-target').value);
+  if (!name) { toast('الرجاء إدخال اسم الهدف'); return; }
+  if (!target || target <= 0) { toast('الرجاء إدخال مبلغ صحيح'); return; }
+  var bgs = ['#e3f2fd','#e8f5e9','#fff3e0','#f3e5f5','#ffebee'];
+  G.push({ n:name, i:pickedIcon, b:bgs[G.length % bgs.length], c:0, t:target, m:0 });
+  renderGoals();
+  closeModal();
+  toast('تم إنشاء الهدف بنجاح! 🎉');
+}
+
+function openAccountModal() {
+  var banks = ['الإنماء','الراجحي','الأهلي','ساب','الرياض','العربي','البلاد','الجزيرة'];
+  var opts = '';
+  for (var i = 0; i < banks.length; i++) opts += '<option value="'+banks[i]+'">'+banks[i]+'</option>';
+  openModal(
+    '<h3 style="margin:0 0 18px;font-size:18px">إضافة حساب بنكي</h3>'+
+    '<label class="field-label">اختر البنك</label>'+
+    '<select class="field" id="a-bank" style="text-align:right">'+opts+'</select>'+
+    '<label class="field-label" style="margin-top:14px">آخر ٤ أرقام من الحساب</label>'+
+    '<input class="field" id="a-num" maxlength="4" inputmode="numeric" placeholder="١٢٣٤" style="text-align:center;direction:ltr">'+
+    '<div style="background:#e8f5e9;border-radius:10px;padding:10px 12px;font-size:12px;color:#00843D;margin-top:14px">🔒 سيتم ربط الحساب بشكل آمن عبر الخدمات المصرفية المفتوحة</div>'+
+    '<button class="btn bggreen" style="margin-top:20px" onclick="saveAccount()">ربط الحساب</button>'
+  );
+}
+function saveAccount() {
+  var bank = document.getElementById('a-bank').value;
+  var n = document.getElementById('a-num').value.trim();
+  if (n.length < 4) { toast('أدخل آخر ٤ أرقام من الحساب'); return; }
+  ACCOUNTS.push({ bank:bank, num:n, active:true });
+  renderAccounts();
+  closeModal();
+  toast('تم ربط الحساب بنجاح ✅');
+}
+
+function openNotif() {
+  openModal(
+    '<h3 style="margin:0 0 16px;font-size:18px">الإشعارات</h3>'+
+    '<div class="roundup-item"><div class="roundup-icon" style="background:#e8f5e9">💰</div><div style="flex:1"><div style="font-size:13px;font-weight:600">تم ادخار ٥٫٥٠ ريال</div><div class="text-xs">من مشترياتك اليوم</div></div></div>'+
+    '<div class="roundup-item"><div class="roundup-icon" style="background:#fff8e1">🎯</div><div style="flex:1"><div style="font-size:13px;font-weight:600">اقتربت من هدف "عمرة"</div><div class="text-xs">٦٠٪ مكتمل — استمر!</div></div></div>'+
+    '<div class="roundup-item"><div class="roundup-icon" style="background:#e3f2fd">📊</div><div style="flex:1"><div style="font-size:13px;font-weight:600">تقريرك الأسبوعي جاهز</div><div class="text-xs">ادخرت ١٦٠ ريال هذا الأسبوع</div></div></div>'+
+    '<button class="btn btn-ghost" style="margin-top:14px" onclick="closeModal()">إغلاق</button>'
+  );
+}
+
+function logout() {
+  closeModal();
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('otp-form').style.display = 'none';
+  document.querySelectorAll('.otp-box').forEach(function(o){ o.value=''; o.classList.remove('filled'); });
+  var ph = document.getElementById('phone'); if (ph) ph.value = '';
+  go('pg-welcome');
+}
+
+// ── Helpers ──
+function num(x) { return x.toLocaleString('ar-SA'); }
+
+function setM(v, el) {
+  document.querySelectorAll('.mult').forEach(function(m) { m.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('mult-v').textContent = num(v);
+  toast('مضاعف التقريب: ×'+num(v));
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast-el');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove('show'); }, 2200);
+}
+</script>
+</body>
+</html>
